@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 
+from __future__ import print_function
 import z3
 
 class Sudoku:
@@ -13,13 +14,15 @@ class Sudoku:
     v = z3.Int("cell[%d,%d]" % (i+1, j+1))
     self.solver.add(v >= 1)
     self.solver.add(v <= 9)
-    if cell != 0:
+    if cell != None:
       self.solver.add(v == cell)
     return v
 
   def print_answer(self):
     for i in range(9):
-      print [self.model.evaluate(self.cells[i][j]) for j in range(9)]
+      for j in range(9):
+        print(self.model.evaluate(self.cells[i][j]), "", end="")
+      print()
 
   def solve(self):
     self.cells = [
@@ -39,9 +42,9 @@ class Sudoku:
       self.model = self.solver.model()
       self.print_answer()
     else:
-      print "failed to solve"
+      print("failed to solve")
 
-_ = 0
+_ = None
 sudoku = Sudoku([
   [_, 6, _, 5, _, 9, _, 4, _],
   [9, 2, _, _, _, _, _, 7, 6],
