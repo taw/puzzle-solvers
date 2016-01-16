@@ -1,0 +1,104 @@
+#!/usr/bin/env python
+
+from __future__ import print_function
+import z3
+
+def digit_var(name):
+  v = z3.BitVec(name, 32)
+  solver.add(v >= 0)
+  solver.add(v <= 9)
+  return v
+
+def word_var(name):
+  v = z3.BitVec(name, 32)
+  digits = ([digit_vars[c] for c in name])
+  val_v = reduce(lambda a,b: a*16+b, digits, 0)
+  solver.add(val_v == v)
+  return v
+
+solver = z3.Solver()
+digits = ["b", "c", "d", "f", "g", "h", "i", "j", "l", "n", "o", "q", "s", "t", "u", "v", "w", "x", "y", "z"]
+digit_vars = {v:digit_var(v) for v in digits}
+words = [
+  "bytwycju",
+  "bzuwtwol",
+  "cgyoyfjg",
+  "ctvtwysu",
+  "dhcqxtfw",
+  "diffhlnl",
+  "fjivucti",
+  "htwizvwi",
+  "jqxizzxq",
+  "niiqztgs",
+  "nshtztns",
+  "nttuhlnq",
+  "oigsjgoj",
+  "oncycbxh",
+  "oqbctlzh",
+  "oqcnwbsd",
+  "sfgsoxdd",
+  "sugvqgww",
+  "syhjizjq",
+  "szblgodf",
+  "thhwohwn",
+  "ttligxut",
+  "uclfqvdu",
+  "udluvhcz",
+  "ugdztnwv",
+  "uxztiywn",
+  "vugljtyn",
+  "vyhyjivb",
+  "wwnnnqbw",
+  "xbfziozy",
+  "xsvuojtx",
+  "yjjowdqh",
+  "yzdgotby",
+  "yzvyjjdy",
+  "zoljwdfl",
+]
+wv = {w:word_var(w) for w in words}
+
+# Everyone occurs twice, this is not quite that
+solver.add(z3.Sum(digit_vars.values()) == 90)
+
+solver.add(wv["bytwycju"] + wv["yzvyjjdy"] ^ wv["vugljtyn"] + wv["ugdztnwv"] | wv["xbfziozy"] == wv["bzuwtwol"])
+solver.add(wv["wwnnnqbw"] - wv["uclfqvdu"] & wv["oncycbxh"] | wv["oqcnwbsd"] ^ wv["cgyoyfjg"] == wv["vyhyjivb"])
+solver.add(wv["yzdgotby"] | wv["oigsjgoj"] | wv["ttligxut"] - wv["dhcqxtfw"] & wv["szblgodf"] == wv["sfgsoxdd"])
+solver.add(wv["yjjowdqh"] & wv["niiqztgs"] + wv["ctvtwysu"] & wv["diffhlnl"] - wv["thhwohwn"] == wv["xsvuojtx"])
+solver.add(wv["nttuhlnq"] ^ wv["oqbctlzh"] - wv["nshtztns"] ^ wv["htwizvwi"] + wv["udluvhcz"] == wv["syhjizjq"])
+
+# And it already fails :-(
+
+
+if solver.check() == z3.sat:
+  model = solver.model()
+  print(model)
+else:
+  print("failed to solve")
+
+# The puzzle:
+"""
+We've captured a strange message. It looks like it is encrypted somehow ...
+iw, hu, fv, lu, dv, cy, og, lc, gy, fq, od, lo, fq, is, ig, gu, hs, hi, ds, cy, oo, os, iu, fs, gu, lh, dq, lv, gu, iw, hv, gu, di, hs, cy, oc, iw, gc
+
+
+We've also intercepted what seems to be a hint to the key:
+bytwycju + yzvyjjdy ^ vugljtyn + ugdztnwv | xbfziozy = bzuwtwol
+    ^         ^          ^          ^          ^
+wwnnnqbw - uclfqvdu & oncycbxh | oqcnwbsd ^ cgyoyfjg = vyhyjivb
+    &         &          &          &          &
+yzdgotby | oigsjgoj | ttligxut - dhcqxtfw & szblgodf = sfgsoxdd
+    +         +          +          +          +
+yjjowdqh & niiqztgs + ctvtwysu & diffhlnl - thhwohwn = xsvuojtx
+    -         -           -         -          -
+nttuhlnq ^ oqbctlzh - nshtztns ^ htwizvwi + udluvhcz = syhjizjq
+    =         =           =         =          =
+fjivucti   zoljwdfl   sugvqgww   uxztiywn   jqxizzxq
+
+
+Note:
+  assume q != 0
+  a letter is a decimal digit is a letter
+  each digit has exactly two different letter representations
+  C-like operator precedence
+"""
