@@ -12,7 +12,7 @@ def digit_var(name):
 def word_var(name):
   v = z3.BitVec(name, 32)
   digits = ([digit_vars[c] for c in name])
-  val_v = reduce(lambda a,b: a*16+b, digits, 0)
+  val_v = reduce(lambda a,b: a*10+b, digits, 0)
   solver.add(val_v == v)
   return v
 
@@ -67,12 +67,25 @@ solver.add(wv["yzdgotby"] | wv["oigsjgoj"] | wv["ttligxut"] - wv["dhcqxtfw"] & w
 solver.add(wv["yjjowdqh"] & wv["niiqztgs"] + wv["ctvtwysu"] & wv["diffhlnl"] - wv["thhwohwn"] == wv["xsvuojtx"])
 solver.add(wv["nttuhlnq"] ^ wv["oqbctlzh"] - wv["nshtztns"] ^ wv["htwizvwi"] + wv["udluvhcz"] == wv["syhjizjq"])
 
-# And it already fails :-(
+solver.add(wv["bytwycju"] ^ wv["wwnnnqbw"] & wv["yzdgotby"] + wv["yjjowdqh"] - wv["nttuhlnq"] == wv["fjivucti"])
+solver.add(wv["yzvyjjdy"] ^ wv["uclfqvdu"] & wv["oigsjgoj"] + wv["niiqztgs"] - wv["oqbctlzh"] == wv["zoljwdfl"])
+solver.add(wv["vugljtyn"] ^ wv["oncycbxh"] & wv["ttligxut"] + wv["ctvtwysu"] - wv["nshtztns"] == wv["sugvqgww"])
+solver.add(wv["ugdztnwv"] ^ wv["oqcnwbsd"] & wv["dhcqxtfw"] + wv["diffhlnl"] - wv["htwizvwi"] == wv["uxztiywn"])
+solver.add(wv["xbfziozy"] ^ wv["cgyoyfjg"] & wv["szblgodf"] + wv["thhwohwn"] - wv["udluvhcz"] == wv["jqxizzxq"])
 
+key = "iw, hu, fv, lu, dv, cy, og, lc, gy, fq, od, lo, fq, is, ig, gu, hs, hi, ds, cy, oo, os, iu, fs, gu, lh, dq, lv, gu, iw, hv, gu, di, hs, cy, oc, iw, gc".split(", ")
 
 if solver.check() == z3.sat:
   model = solver.model()
   print(model)
+  result = []
+  for (a,b) in key:
+    av = int(str(model[digit_vars[a]]))
+    bv = int(str(model[digit_vars[b]]))
+    r = chr(10*av+bv)
+    result.append(r)
+  print("".join(result))
+
 else:
   print("failed to solve")
 
@@ -94,7 +107,6 @@ yjjowdqh & niiqztgs + ctvtwysu & diffhlnl - thhwohwn = xsvuojtx
 nttuhlnq ^ oqbctlzh - nshtztns ^ htwizvwi + udluvhcz = syhjizjq
     =         =           =         =          =
 fjivucti   zoljwdfl   sugvqgww   uxztiywn   jqxizzxq
-
 
 Note:
   assume q != 0
