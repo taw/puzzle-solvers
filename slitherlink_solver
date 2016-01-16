@@ -19,9 +19,9 @@ class SlitherLink:
         corner = self.model.evaluate(self.corner_vars[x,y])
         hor = self.model.evaluate(self.hor_vars[x,y]) if (x,y) in self.hor_vars else None
         if str(corner) == "1":
-          print("*", end="")
+          print(u"\u00b7", end="")
         else:
-          print(".", end="")
+          print(" ", end="")
         if hor == None:
           pass
         elif str(hor) == "1":
@@ -31,10 +31,8 @@ class SlitherLink:
       print("")
 
       for x in range(self.ysize+1):
-        if (x,y) not in self.data:
-          continue
         ver = self.model.evaluate(self.ver_vars[x,y]) if (x,y) in self.ver_vars else None
-        cell = self.data[x,y]
+        cell = self.data.get((x,y), None)
         if ver == None:
           pass
         elif str(ver) == "1":
@@ -67,6 +65,9 @@ class SlitherLink:
     # Rules are:
     # * number in cell indicates number of links next to it
     # * corner can have 0 or 2 links
+    #
+    # One rule I don't know how to implement
+    # * all links are connected
 
     for x in range(self.xsize):
       for y in range(self.ysize):
@@ -80,6 +81,19 @@ class SlitherLink:
               self.ver_vars[x+1,y]
             ) == cell
           )
+    for x in range(self.xsize+1):
+      for y in range(self.ysize+1):
+        corner = self.corner_vars[x,y]
+        edges = [v for v in [
+          self.hor_vars.get((x,y), None),
+          self.hor_vars.get((x-1,y), None),
+          self.ver_vars.get((x,y), None),
+          self.ver_vars.get((x,y-1), None),
+        ] if v != None]
+        self.solver.add(z3.Or(
+          z3.And(z3.Sum(edges) == 0, corner == 0),
+          z3.And(z3.Sum(edges) == 2, corner == 1),
+        ))
 
     if self.solver.check() == z3.sat:
       self.model = self.solver.model()
