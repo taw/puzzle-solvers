@@ -1,0 +1,48 @@
+#!/usr/bin/env python
+
+from __future__ import print_function
+import z3
+
+class VerbalArithmetic:
+  def __init__(self, a, b, c):
+    self.a = [l for l in a]
+    self.b = [l for l in b]
+    self.c = [l for l in c]
+    self.solver = z3.Solver()
+
+  def digit_var(self, name):
+    v = z3.Int(name)
+    self.solver.add(v >= 0)
+    self.solver.add(v <= 9)
+    return v
+
+  def print_answer(self):
+    print([(v,self.model[self.vars[v]]) for v in self.a])
+    print([(v,self.model[self.vars[v]]) for v in self.b])
+    print([(v,self.model[self.vars[v]]) for v in self.c])
+
+  def solve(self):
+    self.vars = {}
+    for word in [self.a, self.b, self.c]:
+      for v in word:
+        if v not in self.vars:
+          self.vars[v] = self.digit_var(v)
+
+    val_a = reduce(lambda x,y: 10*x+self.vars[y], self.a, 0)
+    val_b = reduce(lambda x,y: 10*x+self.vars[y], self.b, 0)
+    val_c = reduce(lambda x,y: 10*x+self.vars[y], self.c, 0)
+    self.solver.add(self.vars[self.a[0]] != 0)
+    self.solver.add(self.vars[self.b[0]] != 0)
+    self.solver.add(self.vars[self.c[0]] != 0)
+    self.solver.add(val_a + val_b == val_c)
+    self.solver.add(z3.Distinct(self.vars.values()))
+
+    if self.solver.check() == z3.sat:
+      self.model = self.solver.model()
+      self.print_answer()
+    else:
+      print("failed to solve")
+
+
+
+VerbalArithmetic("SEND", "MORE", "MONEY").solve()
