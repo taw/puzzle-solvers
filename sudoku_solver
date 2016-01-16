@@ -1,0 +1,57 @@
+#!/usr/bin/env python
+
+import z3
+
+class Sudoku:
+  def __init__(self, data):
+    self.data = data
+    self.solver = z3.Solver()
+
+
+  # private
+  def cell_var(self, cell, i, j):
+    v = z3.Int("cell[%d,%d]" % (i+1, j+1))
+    self.solver.add(v >= 1)
+    self.solver.add(v <= 9)
+    if cell != 0:
+      self.solver.add(v == cell)
+    return v
+
+  def print_answer(self):
+    for i in range(9):
+      print [self.model.evaluate(self.cells[i][j]) for j in range(9)]
+
+  def solve(self):
+    self.cells = [
+      [self.cell_var(self.data[j][i], i, j) for i in range(9)]
+    for j in range(9)]
+
+    for i in range(9):
+      self.solver.add(z3.Distinct(self.cells[i]))
+    for j in range(9):
+      self.solver.add(z3.Distinct([row[j] for row in self.cells]))
+
+    for i in [0,3,6]:
+      for j in [0,3,6]:
+         self.solver.add(z3.Distinct([c for row in self.cells[i:i+3] for c in row[j:j+3]]))
+
+    if self.solver.check() == z3.sat:
+      self.model = self.solver.model()
+      self.print_answer()
+    else:
+      print "failed to solve"
+
+_ = 0
+sudoku = Sudoku([
+  [_, 6, _, 5, _, 9, _, 4, _],
+  [9, 2, _, _, _, _, _, 7, 6],
+  [_, _, 1, _, _, _, 9, _, _],
+  [7, _, _, 6, _, 3, _, _, 9],
+  [_, _, _, _, _, _, _, _, _],
+  [3, _, _, 4, _, 1, _, _, 7],
+  [_, _, 6, _, _, _, 7, _, _],
+  [2, 4, _, _, _, _, _, 6, 5],
+  [_, 9, _, 1, _, 8, _, 3, _],
+])
+
+sudoku.solve()
