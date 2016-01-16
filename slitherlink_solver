@@ -1,0 +1,106 @@
+#!/usr/bin/env python
+
+from __future__ import print_function
+import z3
+
+class SlitherLink:
+  def __init__(self, data):
+    data = [line.split() for line in data.split("\n")]
+    data = [line for line in data if line != []]
+    data = [[None if c == "_" else int(c) for c in line] for line in data]
+    self.xsize = len(data[0])
+    self.ysize = len(data)
+    self.data = {(x,y): data[y][x] for x in range(self.xsize) for y in range(self.ysize)}
+    self.solver = z3.Solver()
+
+  def print_answer(self):
+    for y in range(self.ysize+1):
+      for x in range(self.xsize+1):
+        corner = self.model.evaluate(self.corner_vars[x,y])
+        hor = self.model.evaluate(self.hor_vars[x,y]) if (x,y) in self.hor_vars else None
+        if str(corner) == "1":
+          print("*", end="")
+        else:
+          print(".", end="")
+        if hor == None:
+          pass
+        elif str(hor) == "1":
+          print("-", end="")
+        else:
+          print(" ", end="")
+      print("")
+
+      for x in range(self.ysize+1):
+        if (x,y) not in self.data:
+          continue
+        ver = self.model.evaluate(self.ver_vars[x,y]) if (x,y) in self.ver_vars else None
+        cell = self.data[x,y]
+        if ver == None:
+          pass
+        elif str(ver) == "1":
+          print("|", end="")
+        else:
+          print(" ", end="")
+        if cell == None:
+          print(" ", end="")
+        elif type(cell) == int:
+          print(cell, end="")
+        else:
+          print("?", end="")
+      print("")
+
+  def int01(self, name):
+    v = z3.Int(name)
+    self.solver.add(z3.Or(v == 0, v == 1))
+    return v
+
+  def solve(self):
+    # Around every cell 5,5 there are vars:
+    # X5,5  H5,5  X6,5
+    # V5,5 [CELL] V6,5
+    # X5,6  H5,6  X6,6
+
+    self.corner_vars = {(x,y): self.int01("X%d,%d" % (x,y)) for x in range(self.xsize+1) for y in range(self.ysize+1)}
+    self.hor_vars    = {(x,y): self.int01("H%d,%d" % (x,y)) for x in range(self.xsize)   for y in range(self.ysize+1)}
+    self.ver_vars    = {(x,y): self.int01("V%d,%d" % (x,y)) for x in range(self.xsize+1) for y in range(self.ysize)}
+
+    # Rules are:
+    # * number in cell indicates number of links next to it
+    # * corner can have 0 or 2 links
+
+    for x in range(self.xsize):
+      for y in range(self.ysize):
+        cell = self.data[x,y]
+        if cell != None:
+          self.solver.add(
+            (
+              self.hor_vars[x,y] +
+              self.hor_vars[x,y+1] +
+              self.ver_vars[x,y] +
+              self.ver_vars[x+1,y]
+            ) == cell
+          )
+
+    if self.solver.check() == z3.sat:
+      self.model = self.solver.model()
+      self.print_answer()
+    else:
+      print("failed to solve")
+
+
+slither_link = SlitherLink(
+  """
+  _ _ 1 _ _ 3 _ _ _ 3
+  _ 2 _ _ _ _ 2 _ 3 1
+  _ _ 2 _ _ 2 3 0 2 _
+  _ 2 2 3 _ _ 3 _ _ _
+  _ _ _ 3 _ _ _ 2 _ 2
+  _ _ 2 _ 1 _ 3 _ _ 2
+  3 2 _ 1 _ _ _ _ _ 0
+  3 _ 2 _ _ 3 3 _ _ 0
+  _ _ 3 _ 2 _ _ 2 _ 2
+  _ 2 _ 2 2 _ 1 _ 2 _
+  """
+)
+
+slither_link.solve()
