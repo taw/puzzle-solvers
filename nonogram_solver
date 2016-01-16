@@ -21,7 +21,19 @@ class Nonogram:
         else:
           print(u"\u00b7", sep='', end='')
       print("")
-    print(self.model)
+
+
+  def print_all_answers(self):
+    while self.solver.check() == z3.sat:
+      self.model = self.solver.model()
+      self.print_answer()
+      current_solution = []
+      for v in self.model:
+        current_solution.append(v() != self.model[v])
+      self.solver.add(z3.Or(current_solution))
+      print()
+    else:
+      print("failed to solve")
 
   def setup_vars(self, nums, prefix, size):
     results = []
@@ -63,12 +75,9 @@ class Nonogram:
     for i in range(self.ysize):
       self.setup_cell_constraints(self.cells[i], self.row_vars[i])
 
-    if self.solver.check() == z3.sat:
-      self.model = self.solver.model()
-      self.print_answer()
-    else:
-      print("failed to solve")
+    self.print_all_answers()
 
+# This example seems to have ridiculous number of solutions, most very far from what's in puzzle book
 nonogram = Nonogram(
   [
     [2,5],
