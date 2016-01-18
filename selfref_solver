@@ -21,6 +21,13 @@ solver = z3.Solver()
 q  = {i: question(i) for i in range(1,21)}
 qa = {(i,a): question_answer(i,a) for i in range(1,21) for a in range(1,6)}
 
+a_answers = z3.Sum([qa[i,1] for i in range(1,21)])
+b_answers = z3.Sum([qa[i,2] for i in range(1,21)])
+c_answers = z3.Sum([qa[i,3] for i in range(1,21)])
+d_answers = z3.Sum([qa[i,4] for i in range(1,21)])
+e_answers = z3.Sum([qa[i,5] for i in range(1,21)])
+
+
 # Question 1
 solver.add((q[1] == 1) == (q[1] == 2))
 solver.add((q[1] == 2) == z3.And(q[1] != 2, q[2] == 2))
@@ -50,7 +57,6 @@ solver.add(q[18] != q[19])
 solver.add(q[19] != q[20])
 
 # Question 3
-e_answers = z3.Sum([qa[i,5] for i in range(1,21)])
 solver.add((e_answers == 0) == (q[3] == 1))
 solver.add((e_answers == 1) == (q[3] == 2))
 solver.add((e_answers == 2) == (q[3] == 3))
@@ -58,7 +64,6 @@ solver.add((e_answers == 3) == (q[3] == 4))
 solver.add((e_answers == 4) == (q[3] == 5))
 
 # Question 4
-a_answers = z3.Sum([qa[i,1] for i in range(1,21)])
 solver.add((a_answers == 4) == (q[4] == 1))
 solver.add((a_answers == 5) == (q[4] == 2))
 solver.add((a_answers == 6) == (q[4] == 3))
@@ -66,11 +71,11 @@ solver.add((a_answers == 7) == (q[4] == 4))
 solver.add((a_answers == 8) == (q[4] == 5))
 
 # Question 5
-solver.add((q[5] == q[1]) == (q[5] == 1))
-solver.add((q[5] == q[2]) == (q[5] == 2))
-solver.add((q[5] == q[3]) == (q[5] == 3))
-solver.add((q[5] == q[4]) == (q[5] == 4))
-solver.add((q[5] == q[5]) == (q[5] == 5))
+solver.add(z3.Implies(q[5] == 1, q[5] == q[1]))
+solver.add(z3.Implies(q[5] == 2, q[5] == q[2]))
+solver.add(z3.Implies(q[5] == 3, q[5] == q[3]))
+solver.add(z3.Implies(q[5] == 4, q[5] == q[4]))
+solver.add(z3.Implies(q[5] == 5, q[5] == q[5]))
 
 # Question 6
 solver.add((q[17] == 3) == (q[6] == 1))
@@ -80,22 +85,50 @@ solver.add(z3.Or(q[17] == 1, q[17] == 2) == (q[6] == 4))
 solver.add(q[6] != 5)
 
 # Question 7
-# TODO
+solver.add(z3.Or(q[7] - q[8] == 4, q[8] - q[7] == 4) == (q[7] == 1))
+solver.add(z3.Or(q[7] - q[8] == 3, q[8] - q[7] == 3)== (q[7] == 2))
+solver.add(z3.Or(q[7] - q[8] == 2, q[8] - q[7] == 2)== (q[7] == 3))
+solver.add(z3.Or(q[7] - q[8] == 1, q[8] - q[7] == 1)== (q[7] == 4))
+solver.add(z3.Or(q[7] - q[8] == 0, q[8] - q[7] == 0)== (q[7] == 5))
 
 # Question 8
-# TODO
+solver.add((a_answers + e_answers == 4) == (q[8] == 1))
+solver.add((a_answers + e_answers == 5) == (q[8] == 2))
+solver.add((a_answers + e_answers == 6) == (q[8] == 3))
+solver.add((a_answers + e_answers == 7) == (q[8] == 4))
+solver.add((a_answers + e_answers == 8) == (q[8] == 5))
 
 # Question 9
-# TODO
+solver.add((q[10] == q[9]) == (q[9] == 1))
+solver.add(z3.And(q[10] != q[9], q[11] == q[9]) == (q[9] == 2))
+solver.add(z3.And(q[10] != q[9], q[11] != q[9], q[12] == q[9]) == (q[9] == 3))
+solver.add(z3.And(q[10] != q[9], q[11] != q[9], q[12] != q[9], q[13] == q[9]) == (q[9] == 4))
+solver.add(z3.And(q[10] != q[9], q[11] != q[9], q[12] != q[9], q[13] != q[9], q[14] == q[9]) == (q[9] == 5))
 
 # Question 10
-# TODO
+solver.add((q[16] == 4) == (q[10] == 1))
+solver.add((q[16] == 1) == (q[10] == 2))
+solver.add((q[16] == 5) == (q[10] == 3))
+solver.add((q[16] == 2) == (q[10] == 4))
+solver.add((q[16] == 3) == (q[10] == 5))
 
 # Question 11
-# TODO
+prec_b_answers = z3.Sum([qa[i,2] for i in range(1,11)])
+solver.add((prec_b_answers == 0) == (q[11] == 1))
+solver.add((prec_b_answers == 1) == (q[11] == 2))
+solver.add((prec_b_answers == 2) == (q[11] == 3))
+solver.add((prec_b_answers == 3) == (q[11] == 4))
+solver.add((prec_b_answers == 4) == (q[11] == 5))
 
 # Question 12
-# TODO
+def cons_in(*ary):
+  return z3.Or([cons_answers == i for i in ary])
+cons_answers = b_answers + c_answers + d_answers
+solver.add(z3.Implies(q[12] == 1, cons_in(2,4,6,8,10,12,14,16,18,20)))
+solver.add(z3.Implies(q[12] == 2, cons_in(1,3,5,7,9,11,13,15,17,19)))
+solver.add(z3.Implies(q[12] == 3, cons_in(1,4,9,16)))
+solver.add(z3.Implies(q[12] == 4, cons_in(2,3,5,7,11,13,17,19)))
+solver.add(z3.Implies(q[12] == 5, cons_in(5,10,15,20)))
 
 # Question 13
 solver.add(q[1] != 1)
@@ -110,31 +143,46 @@ solver.add((q[17] == 1) == (q[13] == 5))
 solver.add(q[19] != 1)
 
 # Question 14
-d_answers = z3.Sum([qa[i,4] for i in range(1,21)])
-solver.add((a_answers == 6) == (q[4] == 1))
-solver.add((a_answers == 7) == (q[4] == 2))
-solver.add((a_answers == 8) == (q[4] == 3))
-solver.add((a_answers == 9) == (q[4] == 4))
-solver.add((a_answers == 10) == (q[4] == 5))
+solver.add((d_answers == 6) == (q[4] == 1))
+solver.add((d_answers == 7) == (q[4] == 2))
+solver.add((d_answers == 8) == (q[4] == 3))
+solver.add((d_answers == 9) == (q[4] == 4))
+solver.add((d_answers == 10) == (q[4] == 5))
 
 # Question 15
 solver.add(q[15] == q[12])
 
 # Question 16
-# TODO
+solver.add((q[10] == 4) == (q[16] == 1))
+solver.add((q[10] == 3) == (q[16] == 2))
+solver.add((q[10] == 2) == (q[16] == 3))
+solver.add((q[10] == 1) == (q[16] == 4))
+solver.add((q[10] == 5) == (q[16] == 5))
 
 # Question 17
-# TODO
+solver.add((q[6] == 3) == (q[17] == 1))
+solver.add((q[6] == 4) == (q[17] == 2))
+solver.add((q[6] == 5) == (q[17] == 3))
+solver.add(z3.And(q[6] != 3, q[6] != 4, q[6] != 5) == (q[17] == 4))
+solver.add(q[17] != 5)
 
 # Question 18
-# TODO
+solver.add((a_answers == b_answers) == (q[18] == 1))
+solver.add((a_answers == c_answers) == (q[18] == 2))
+solver.add((a_answers == d_answers) == (q[18] == 3))
+solver.add((a_answers == e_answers) == (q[18] == 4))
+solver.add(z3.And(
+  a_answers != b_answers,
+  a_answers != c_answers,
+  a_answers != d_answers,
+  a_answers != e_answers
+) == (q[18] == 5))
 
 # Question 19
 solver.add(q[19] == q[19])
 
 # Question 20
-# TODO
-
+solver.add(q[20] == 5)
 
 # Print solutions
 

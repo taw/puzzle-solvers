@@ -17,6 +17,7 @@ Complete:
 * light up
 * minisudoku
 * nonogram: gets bad solution anyway, as example puzzle was ambiguous
+* selfref
 * sudoku
 * verbal arithmetic
 
