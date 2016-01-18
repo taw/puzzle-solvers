@@ -7,5 +7,17 @@ To get z3 library, run this or equivalent:
 
     $ brew install z3
 
-Unfortunately many solvers don't fully follow rules of puzzles they try to solve,
+== Solver status ==
+
+Unfortunately some solvers don't fully follow rules of puzzles they try to solve,
 if rules were rather difficult to implement.
+
+* bridges: complete
+* clogic: incomplete (no three same rule missing, gets correct solution anyway)
+* light up: complete
+* minisudoku: complete
+* nonogram: complete (gets bad solution anyway, as example puzzle was ambiguous)
+* slitherlink: incomplete (all connected rule missing)
+* sudoku: complete
+* trees: incomplete (1-1 tree-camp mapping missing)
+* verbal arithmetic: complete
