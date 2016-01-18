@@ -32,14 +32,32 @@ class TreePuzzzle:
           print(u" ", end="")
       print("")
 
+  def surrounding_camps(self,x0,y0):
+    result = []
+    for y in [y0-1,y0,y0+1]:
+      for x in [x0-1,x0,x0+1]:
+        if x < 0 or x >= self.xsize or y < 0 or y >= self.ysize or (x,y) == (x0,y0):
+          pass
+        else:
+          result.append(self.camps[x,y])
+    return result
 
   def solve(self):
     self.camps = {(x,y): self.int01(x,y) for x in range(self.xsize) for y in range(self.ysize)}
     # Rows
+    for x in range(self.xsize):
+      self.solver.add(z3.Sum([self.camps[x,y] for y in range(self.ysize)]) == self.cols[x])
     # Columns
+    for y in range(self.ysize):
+      self.solver.add(z3.Sum([self.camps[x,y] for x in range(self.xsize)]) == self.rows[y])
+    # Camps not on trees
     # 1:1 mapping between trees and camps
-
-
+    # FIXME: This constraint is weaker than puzzle requires, might result is fake solutions
+    for y in range(self.ysize):
+      for x in range(self.xsize):
+        if self.data[x,y]:
+          self.solver.add(self.camps[x,y] == 0)
+          self.solver.add(z3.Sum(self.surrounding_camps(x,y)) >= 1)
 
     if self.solver.check() == z3.sat:
       self.model = self.solver.model()
