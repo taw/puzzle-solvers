@@ -10,8 +10,10 @@ class LetterConnections:
     self.ysize  = len(data)
 
     self.letters = {}
+    self.rletters = {}
     self.starts = {}
     self.ends = {}
+    self.special_ends = {}
 
     data = {(x,y): data[y][x] for x in range(self.xsize) for y in range(self.ysize)}
 
@@ -23,8 +25,11 @@ class LetterConnections:
         if letter in self.ends:
           raise Exception("Letter %s occurs more than twice" % letter)
         self.ends[letter] = (x,y)
+        self.special_ends[x,y] = letter
       else:
-        self.letters[letter] = len(self.letters)
+        i = len(self.letters)
+        self.letters[letter] = i
+        self.rletters[i] = letter
         self.starts[letter] = (x,y)
     for letter in self.letters:
       if letter not in self.ends:
@@ -35,24 +40,71 @@ class LetterConnections:
   def print_answer(self):
     for y in range(self.ysize):
       for x in range(self.ysize):
-        print("?", end="")
+        li = int(str(self.model.evaluate(self.line[x,y])))
+        l = self.rletters[li]
+        d = int(str(self.model.evaluate(self.dir[x,y])))
+        if (x,y) == self.starts[l]:
+          print(u"\u2190\u2191\u2192\u2193"[d]+l+" ", end="")
+        elif (x,y) == self.ends[l]:
+          print("*"+l+" ", end="")
+        else:
+          print(u"\u2190\u2191\u2192\u2193"[d]+l.lower()+" ", end="")
       print("")
 
+  def line_var(self, x, y):
+    v = z3.Int("l%d,%d" % (x,y))
+    self.solver.add(v >= 0)
+    self.solver.add(v < len(self.letters))
+    return v
+
+  def dir_var(self, x, y):
+    v = z3.Int("d%d,%d" % (x,y))
+    self.solver.add(v >= 0)
+    self.solver.add(v <= 3)
+    return v
+
   def solve(self):
-    pass
+    self.line = {(x,y): self.line_var(x,y) for x in range(self.xsize) for y in range(self.ysize)}
+    self.dir  = {(x,y): self.dir_var(x,y) for x in range(self.xsize) for y in range(self.ysize)}
+
+    for letter in self.letters:
+      i = self.letters[letter]
+      self.solver.add(self.line[self.starts[letter]] == i)
+      self.solver.add(self.line[self.ends[letter]] == i)
+
+    for y in range(self.ysize):
+      for x in range(self.ysize):
+        if (x,y) in self.special_ends:
+          continue
+        # Direction Left
+        if x == 0:
+          self.solver.add(self.dir[x,y] != 0)
+        else:
+          self.solver.add(z3.Implies(self.dir[x,y] == 0, self.line[x,y] == self.line[x-1,y]))
+        # Direction Up
+        if y == 0:
+          self.solver.add(self.dir[x,y] != 1)
+        else:
+          self.solver.add(z3.Implies(self.dir[x,y] == 1, self.line[x,y] == self.line[x,y-1]))
+        # Direction Right
+        if x == self.xsize - 1:
+          self.solver.add(self.dir[x,y] != 2)
+        else:
+          self.solver.add(z3.Implies(self.dir[x,y] == 2, self.line[x,y] == self.line[x+1,y]))
+        # Direction Down
+        if y == self.ysize - 1:
+          self.solver.add(self.dir[x,y] != 3)
+        else:
+          self.solver.add(z3.Implies(self.dir[x,y] == 3, self.line[x,y] == self.line[x,y+1]))
+
+
+
 
     if self.solver.check() == z3.sat:
       self.model = self.solver.model()
       self.print_answer()
     else:
       print("failed to solve")
-
-
-
-
-
-
-
 
 LetterConnections(
 """
