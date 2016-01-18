@@ -12,14 +12,19 @@ To get z3 library, run this or equivalent:
 Unfortunately some solvers don't fully follow rules of puzzles they try to solve,
 if rules were rather difficult to implement.
 
-* bridges: complete
-* clogic: incomplete (no three same rule missing, gets correct solution anyway)
-* letter connections: incomplete (phantom loops possible; rarely problem in practice)
-* light up: complete
-* minisudoku: complete
-* nonogram: complete (gets bad solution anyway, as example puzzle was ambiguous)
+Complete:
+* bridges
+* light up
+* minisudoku
+* nonogram: gets bad solution anyway, as example puzzle was ambiguous
+* sudoku
+* verbal arithmetic
+
+Incomplete:
+* clogic: no three same rule missing, gets correct solution anyway
+* letter connections: phantom loops possible; rarely problem in practice
+* slitherlink: all connected rule missing
+* trees: 1-1 tree-camp mapping missing
+
+Broken:
 * nurikabe: my approach is probably not going to work
-* slitherlink: incomplete (all connected rule missing)
-* sudoku: complete
-* trees: incomplete (1-1 tree-camp mapping missing)
-* verbal arithmetic: complete
