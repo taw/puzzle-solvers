@@ -18,6 +18,7 @@ if rules were rather difficult to implement.
 * light up: complete
 * minisudoku: complete
 * nonogram: complete (gets bad solution anyway, as example puzzle was ambiguous)
+* nurikabe: my approach is probably not going to work
 * slitherlink: incomplete (all connected rule missing)
 * sudoku: complete
 * trees: incomplete (1-1 tree-camp mapping missing)

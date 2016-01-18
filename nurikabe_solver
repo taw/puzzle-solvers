@@ -38,10 +38,18 @@ class Nurikabe:
   def island_var(self, x, y):
     v = z3.Int("v%d,%d" % (x,y))
     self.solver.add(v >= 0)
+    self.solver.add(v <= len(self.islands))
+    return v
+
+  def ivar(self, x, y, i):
+    v = z3.Int("i%d,%d,%d" % (x,y,i))
+    self.solver.add(v >= 0)
+    self.solver.add(v <= 1)
     return v
 
   def solve(self):
-    self.vars = {(x,y):self.island_var(x,y)  for x in range(self.xsize) for y in range(self.xsize)}
+    self.vars  = {(x,y):self.island_var(x,y) for x in range(self.xsize) for y in range(self.ysize)}
+    self.ivars = {(x,y,i):self.ivar(x,y,i) for x in range(self.xsize) for y in range(self.ysize) for i in range(len(self.islands)+1) }
 
     # No black squares
     for x in range(self.xsize-1):
@@ -52,6 +60,20 @@ class Nurikabe:
           self.vars[x,y+1] != 0,
           self.vars[x+1,y+1] != 0
         ))
+
+    for x in range(self.xsize-1):
+      for y in range(self.ysize-1):
+        for i in range(len(self.islands)+1):
+          self.solver.add(
+            (self.ivars[x,y,i] == 1) == (self.vars[x,y] == i)
+          )
+    for i in range(len(self.islands)+1):
+      if i != 0:
+        island_size = self.data[self.rislands[i]]
+        print(i,island_size)
+        self.solver.add(
+          z3.Sum([self.ivars[x,y,i] for x in range(self.xsize) for y in range(self.ysize)]) == island_size
+        )
 
     # Every island gets own ID
     for (x,y) in self.islands:
