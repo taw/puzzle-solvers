@@ -53,6 +53,8 @@ class TreePuzzzle:
     # Camps not on trees
     # 1:1 mapping between trees and camps
     # FIXME: This constraint is weaker than puzzle requires, might result is fake solutions
+    #
+    # Solution idea: (x,y,tree id) var for every camp
     for y in range(self.ysize):
       for x in range(self.xsize):
         if self.data[x,y]:
@@ -85,5 +87,3 @@ x..x..x.x.
 x.......x.
 """
 ).solve()
-
-

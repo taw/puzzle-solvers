@@ -6,3 +6,6 @@ In other words - use Python 2.x to run these.
 To get z3 library, run this or equivalent:
 
     $ brew install z3
+
+Unfortunately many solvers don't fully follow rules of puzzles they try to solve,
+if rules were rather difficult to implement.
