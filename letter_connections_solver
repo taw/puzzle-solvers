@@ -1,0 +1,70 @@
+#!/usr/bin/env python
+
+from __future__ import print_function
+import z3
+
+class LetterConnections:
+  def __init__(self,data):
+    data = [line for line in data.split("\n") if line != ""]
+    self.xsize  = len(data[0])
+    self.ysize  = len(data)
+
+    self.letters = {}
+    self.starts = {}
+    self.ends = {}
+
+    data = {(x,y): data[y][x] for x in range(self.xsize) for y in range(self.ysize)}
+
+    for (x,y) in data:
+      letter = data[x,y]
+      if letter == ".":
+        continue
+      if letter in self.letters:
+        if letter in self.ends:
+          raise Exception("Letter %s occurs more than twice" % letter)
+        self.ends[letter] = (x,y)
+      else:
+        self.letters[letter] = len(self.letters)
+        self.starts[letter] = (x,y)
+    for letter in self.letters:
+      if letter not in self.ends:
+        raise Exception("Letter %s occurs only once" % letter)
+
+    self.solver = z3.Solver()
+
+  def print_answer(self):
+    for y in range(self.ysize):
+      for x in range(self.ysize):
+        print("?", end="")
+      print("")
+
+  def solve(self):
+    pass
+
+    if self.solver.check() == z3.sat:
+      self.model = self.solver.model()
+      self.print_answer()
+    else:
+      print("failed to solve")
+
+
+
+
+
+
+
+
+LetterConnections(
+"""
+..KJ....FE
+.FJ.......
+......G...
+.K.I......
+.......D..
+IE......B.
+...H...CD.
+...A..C...
+.A.H......
+...B.G....
+"""
+).solve()
