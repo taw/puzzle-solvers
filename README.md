@@ -14,6 +14,7 @@ if rules were rather difficult to implement.
 
 * bridges: complete
 * clogic: incomplete (no three same rule missing, gets correct solution anyway)
+* letter connections: incomplete (phantom loops possible; rarely problem in practice)
 * light up: complete
 * minisudoku: complete
 * nonogram: complete (gets bad solution anyway, as example puzzle was ambiguous)
