@@ -12,17 +12,27 @@ class Nurikabe:
     self.data = {(x,y):data[y][x] for x in range(self.xsize) for y in range(self.xsize)}
     self.solver = z3.Solver()
 
-  def print_answer(self):
+    self.islands = {}
+    self.rislands = {}
     for y in range(self.ysize):
       for x in range(self.xsize):
         if self.data[x,y] != None:
-          print(self.data[x,y], end="")
+          i = len(self.islands) + 1
+          self.islands[x,y] = i
+          self.rislands[i] = (x,y)
+
+  def print_answer(self):
+    for y in range(self.ysize):
+      for x in range(self.xsize):
+        i = int(str(self.model.evaluate(self.vars[x,y])))
+        if self.data[x,y] != None:
+          # self.data[x,y]
+          print("x%02d " % i, end="")
         else:
-          i = str(self.model.evaluate(self.vars[x,y]))
           if i == 0:
-            print("#", end="")
+            print("#   " , end="")
           else:
-            print(".", end="")
+            print(".%02d " % i, end="")
       print("")
 
   def island_var(self, x, y):
@@ -35,13 +45,31 @@ class Nurikabe:
 
     # No black squares
     for x in range(self.xsize-1):
-      for y in range(self.xsize-1):
+      for y in range(self.ysize-1):
         self.solver.add(z3.Or(
           self.vars[x,y] != 0,
           self.vars[x+1,y] != 0,
           self.vars[x,y+1] != 0,
           self.vars[x+1,y+1] != 0
         ))
+
+    # Every island gets own ID
+    for (x,y) in self.islands:
+      self.solver.add(self.vars[x,y] == self.islands[x,y])
+
+    # Islands don't touch
+    for x in range(self.xsize):
+      for y in range(self.ysize):
+        for (x1,y1) in [(x+1,y), (x,y+1)]:
+          if (x1,y1) not in self.vars:
+            continue
+          a = self.vars[x,y]
+          b = self.vars[x1,y1]
+          self.solver.add(z3.Or(
+            a == 0,
+            b == 0,
+            a == b
+          ))
 
     if self.solver.check() == z3.sat:
       self.model = self.solver.model()
