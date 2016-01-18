@@ -1,0 +1,63 @@
+#!/usr/bin/env python
+
+from __future__ import print_function
+import z3
+
+class Nurikabe:
+  def __init__(self, data):
+    data = [line for line in data.split("\n") if line != ""]
+    data = [[(None if c == "." else int(c)) for c in line] for line in data]
+    self.xsize = len(data[0])
+    self.ysize = len(data)
+    self.data = {(x,y):data[y][x] for x in range(self.xsize) for y in range(self.xsize)}
+    self.solver = z3.Solver()
+
+  def print_answer(self):
+    for y in range(self.ysize):
+      for x in range(self.xsize):
+        if self.data[x,y] != None:
+          print(self.data[x,y], end="")
+        else:
+          i = str(self.model.evaluate(self.vars[x,y]))
+          if i == 0:
+            print("#", end="")
+          else:
+            print(".", end="")
+      print("")
+
+  def island_var(self, x, y):
+    v = z3.Int("v%d,%d" % (x,y))
+    self.solver.add(v >= 0)
+    return v
+
+  def solve(self):
+    self.vars = {(x,y):self.island_var(x,y)  for x in range(self.xsize) for y in range(self.xsize)}
+
+    # No black squares
+    for x in range(self.xsize-1):
+      for y in range(self.xsize-1):
+        self.solver.add(z3.Or(
+          self.vars[x,y] != 0,
+          self.vars[x+1,y] != 0,
+          self.vars[x,y+1] != 0,
+          self.vars[x+1,y+1] != 0
+        ))
+
+    if self.solver.check() == z3.sat:
+      self.model = self.solver.model()
+      self.print_answer()
+    else:
+      print("failed to solve")
+
+Nurikabe("""
+.3.3.5.1.2
+..........
+........1.
+2.4.......
+.......2..
+.....4....
+4........1
+..........
+2.5..1.2..
+..........
+""").solve()
