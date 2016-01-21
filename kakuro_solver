@@ -5,10 +5,15 @@ import z3
 
 class Kakuro:
   def print_board(self):
-    for row in self.data:
-      for cell in row:
+    for y in range(self.ysize):
+      for x in range(self.xsize):
+        cell = self.data[x,y]
         if cell == None:
-          print("  _  ", end="")
+          if self.model and (x,y) in self.cells:
+            a = str(self.model.evaluate(self.cells[x,y]))
+            print(" [%s] " % a, end="")
+          else:
+            print("  _  ", end="")
         elif cell == (0,0):
           print("  x  ", end="")
         else:
@@ -30,13 +35,47 @@ class Kakuro:
       b = 0 if b == "" else int(b)
       return (a,b)
 
-
   def __init__(self, data):
     data = [[self.parse_cell(cell) for cell in line.split()] for line in data.split("\n") if line != ""]
-    self.data = data
-    self.print_board()
+    self.xsize = len(data[0])
+    self.ysize = len(data)
+    self.data = {(x,y): data[y][x] for x in range(self.xsize) for y in range(self.ysize)}
+    self.solver = z3.Solver()
 
+  def cell_var(self,x,y):
+    v = z3.Int("c%d,%d" % (x,y))
+    self.solver.add(v >= 1)
+    self.solver.add(v <= 9)
+    return v
 
+  def setup_line(self, x0, y0, dx, dy, sum):
+    if sum == 0:
+      return
+    vs = []
+    x, y = x0+dx, y0+dy
+    while (x,y) in self.cells:
+      vs.append(self.cells[x,y])
+      x += dx
+      y += dy
+    self.solver.add(z3.Distinct(vs))
+    self.solver.add(z3.Sum(vs) == sum)
+
+  def solve(self):
+    self.cells = {(x,y): self.cell_var(x,y) for x in range(self.xsize) for y in range(self.ysize) if self.data[x,y] == None}
+    for y in range(self.ysize):
+      for x in range(self.xsize):
+        cell = self.data[x,y]
+        if cell == None:
+          continue
+        (a,b) = cell
+        self.setup_line(x,y,0,1,a)
+        self.setup_line(x,y,1,0,b)
+
+    if self.solver.check() == z3.sat:
+      self.model = self.solver.model()
+      self.print_board()
+    else:
+      print("failed to solve")
 
 
 
@@ -53,4 +92,4 @@ Kakuro(
   /24   _     _     _     /23   _     _     _     _     _
   /10   _     _     _     /11   _     _     _     x     x
 '''
-)
+).solve()
