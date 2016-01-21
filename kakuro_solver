@@ -1,0 +1,56 @@
+#!/usr/bin/env python
+
+from __future__ import print_function
+import z3
+
+class Kakuro:
+  def print_board(self):
+    for row in self.data:
+      for cell in row:
+        if cell == None:
+          print("  _  ", end="")
+        elif cell == (0,0):
+          print("  x  ", end="")
+        else:
+          a,b = cell
+          a = "  " if a == 0 else ("%2d" % a)
+          b = "  " if b == 0 else ("%-2d" % b)
+          print("%s/%s" % (a,b), end="")
+        print(" ", end = "")
+      print()
+
+  def parse_cell(self, cell):
+    if cell == "_":
+      return None
+    elif cell == "x":
+      return (0,0)
+    else:
+      a,b = cell.split("/")
+      a = 0 if a == "" else int(a)
+      b = 0 if b == "" else int(b)
+      return (a,b)
+
+
+  def __init__(self, data):
+    data = [[self.parse_cell(cell) for cell in line.split()] for line in data.split("\n") if line != ""]
+    self.data = data
+    self.print_board()
+
+
+
+
+
+Kakuro(
+'''
+  x     x     x   10/   24/   29/     x   11/   21/   10/
+  x   11/   19/24   _     _     _     /6    _     _     _
+  /31   _     _     _     _     _   10/20   _     _     _
+  /4    _     _   22/18   _     _     _   23/13   _     _
+  /18   _     _     _   24/26   _     _     _     _     _
+  x   19/   30/16   _     _   10/11   _     _   11/   20/
+  /34   _     _     _     _     _   23/23   _     _     _
+  /7    _     _    9/16   _     _     _    3/4    _     _
+  /24   _     _     _     /23   _     _     _     _     _
+  /10   _     _     _     /11   _     _     _     x     x
+'''
+)
