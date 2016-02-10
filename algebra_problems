@@ -19,7 +19,26 @@ def problem_01():
   print_solutions("01", solver)
   # No nice way to say x is unconstrained
 
+def declare_abs(solver, var, expr):
+  solver.add(z3.Or(
+    z3.And(var == expr,  expr >= 0),
+    z3.And(var == -expr, expr <= 0)
+  ))
+
+def problem_03():
+  solver = z3.Solver()
+  x = z3.Real("x")
+  xm2abs = z3.Real("|x-2|")
+  declare_abs(solver, xm2abs, x-2)
+  m6abs = z3.Real("|-6|")
+  declare_abs(solver, m6abs, -6)
+  solver.add(x < 2)
+  solver.add(xm2abs == 4*m6abs)
+  print_solutions("03", solver)
+
+
 problem_01()
+problem_03()
 
 """
 http://www.analyzemath.com/Algebra1/Algebra1.html
@@ -27,5 +46,9 @@ http://www.analyzemath.com/Algebra1/Algebra1.html
 
 Problem 1: Solve the equation
   5(-3x - 2) - (x - 3) = -4(4x + 5) + 13
+
+Problem 3: If x <2, simplify
+  |x - 2| = 4|-6|
+(actually I misread original, whatever)
 
 """
