@@ -1,0 +1,31 @@
+#!/usr/bin/env python
+
+from __future__ import print_function
+import z3
+
+def print_solutions(problem, solver):
+  print("Solution to problem %s:" % problem)
+  if solver.check() == z3.sat:
+    model = solver.model()
+    for v in model:
+      print("* %s = %s" % (v, model[v]))
+  else:
+    print("* Can't solve the problem")
+
+def problem_01():
+  solver = z3.Solver()
+  x = z3.Real("x")
+  solver.add(5*(-3*x - 2) - (x - 3) == -4*(4*x + 5) + 13)
+  print_solutions("01", solver)
+  # No nice way to say x is unconstrained
+
+problem_01()
+
+"""
+http://www.analyzemath.com/Algebra1/Algebra1.html
+
+
+Problem 1: Solve the equation
+  5(-3x - 2) - (x - 3) = -4(4x + 5) + 13
+
+"""
