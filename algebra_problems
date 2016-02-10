@@ -36,9 +36,27 @@ def problem_03():
   solver.add(xm2abs == 4*m6abs)
   print_solutions("03", solver)
 
+def declare_distance(solver, a_b, ax, ay, bx, by):
+  solver.add(a_b >= 0)
+  solver.add(a_b**2 == (ax-bx)**2 + (ay-by)**2)
+
+def problem_04():
+  solver = z3.Solver()
+  ax = z3.Real("ax")
+  ay = z3.Real("ay")
+  bx = z3.Real("bx")
+  by = z3.Real("by")
+  a_b = z3.Real("|a-b|")
+  declare_distance(solver, a_b, ax, ay, bx, by)
+  solver.add(ax == -4)
+  solver.add(ay == -5)
+  solver.add(bx == -1)
+  solver.add(by == -1)
+  print_solutions("04", solver)
 
 problem_01()
 problem_03()
+problem_04()
 
 """
 http://www.analyzemath.com/Algebra1/Algebra1.html
@@ -50,5 +68,8 @@ Problem 1: Solve the equation
 Problem 3: If x <2, simplify
   |x - 2| = 4|-6|
 (actually I misread original, whatever)
+
+Problem 4: Find the distance between the points (-4 , -5) and (-1 , -1).
+
 
 """
