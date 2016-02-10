@@ -1,0 +1,38 @@
+#!/usr/bin/env python
+
+from __future__ import print_function
+import z3
+
+solver = z3.Solver()
+
+ax = z3.Real("a.x")
+ay = z3.Real("a.y")
+bx = z3.Real("b.x")
+by = z3.Real("b.y")
+cx = z3.Real("c.x")
+cy = z3.Real("c.y")
+dx = z3.Real("d.x")
+dy = z3.Real("d.y")
+
+a_c = z3.Real("|a-c|")
+b_d = z3.Real("|b-d|")
+
+solver.add(bx == 0)
+solver.add(by == 0)
+solver.add(cx == 10)
+solver.add(cy == 0)
+solver.add(dx == cx)
+solver.add(ay == dy)
+solver.add(ax == 0)
+
+# BD is on the circle
+solver.add(b_d**2 == (bx-dx)**2 + (by-dy)**2)
+solver.add(b_d == 20)
+
+solver.add(a_c**2 == (ax-cx)**2 + (ay-cy)**2)
+
+
+if solver.check() == z3.sat:
+  print(solver.model())
+else:
+  print("Can't solve the problem")
