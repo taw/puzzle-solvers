@@ -54,9 +54,19 @@ def problem_04():
   solver.add(by == -1)
   print_solutions("04", solver)
 
+def problem_05():
+  solver = z3.Solver()
+  x = z3.Real("x")
+  y = z3.Real("y")
+  solver.add(2*x - 4*y == 9)
+  solver.add(y == 0)
+  print_solutions("05", solver)
+
+
 problem_01()
 problem_03()
 problem_04()
+problem_05()
 
 """
 http://www.analyzemath.com/Algebra1/Algebra1.html
@@ -71,5 +81,6 @@ Problem 3: If x <2, simplify
 
 Problem 4: Find the distance between the points (-4 , -5) and (-1 , -1).
 
-
+Problem 5: Find the x intercept of the graph of the equation
+  2x - 4y = 9
 """
