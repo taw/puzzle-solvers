@@ -22,10 +22,27 @@ def problem_01():
   else:
     print("No solution")
 
+def problem_02():
+  """
+  A car starts from rest and accelerates uniformly over a time of 5.21 seconds for a distance of 110 m. Determine the acceleration of the car.
+  """
+  s = Solver()
+  a = Real("a")
+  t = Real("t")
+  d = Real("d")
+
+  s.add(d == a*t*t/2)
+  s.add(t == 5.21)
+  s.add(d == 110)
+
+  if s.check() == sat:
+    print(s.model())
+  else:
+    print("No solution")
 
 
 problem_01()
-
+problem_02()
 
 
 """
