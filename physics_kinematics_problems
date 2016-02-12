@@ -78,13 +78,30 @@ def problem_04():
 
   print_solution(s, "04")
 
+def problem_05():
+  """
+  A feather is dropped on the moon from a height of 1.40 meters.
+  The acceleration of gravity on the moon is 1.67 m/s2.
+  Determine the time for the feather to fall to the surface of the moon.
+  """
+  s = Solver()
+  a = Real("a")
+  t = Real("t")
+  d = Real("d")
+
+  s.add(a == 1.67)
+  s.add(d == 1.40)
+  s.add(t >= 0)
+  s.add(d == a*t*t/2)
+
+  print_solution(s, "05")
+
 
 
 set_option(rational_to_decimal=True)
-problem_01()
-problem_02()
-problem_03()
-problem_04()
+for p in dir():
+  if p.startswith("problem_"):
+    globals()[p]()
 
 """
 http://www.physicsclassroom.com/class/1DKin/Lesson-6/Sample-Problems-and-Solutions
