@@ -1,0 +1,24 @@
+#!/usr/bin/env python
+
+from __future__ import print_function
+from z3 import *
+
+def validate_sign_trick():
+  """
+  sign = v >> (sizeof(int) * CHAR_BIT - 1);
+  """
+  v = BitVec("v", 32)
+  s = v >> 31
+  print("Validating sign trick:")
+  prove(
+    Or(
+      And(v < 0, s == -1),
+      And(v >= 0, s == 0),
+    )
+  )
+
+validate_sign_trick()
+
+"""
+Based on https://graphics.stanford.edu/~seander/bithacks.html
+"""
