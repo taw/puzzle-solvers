@@ -156,6 +156,23 @@ def problem_08():
 
   print_solution(s, "08")
 
+def problem_09():
+  """
+  A car traveling at 22.4 m/s skids to a stop in 2.55 s.
+  Determine the skidding distance of the car (assume uniform acceleration).
+  """
+
+  s = Solver()
+  t = Real("t")
+  d = Real("d")
+  v = Real("v")
+
+  s.add(v == 22.4)
+  s.add(t == 2.55)
+  s.add(d == t*v/2)
+
+  print_solution(s, "09")
+
 
 set_option(rational_to_decimal=True)
 for p in dir():
