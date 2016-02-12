@@ -116,6 +116,25 @@ def problem_06():
 
   print_solution(s, "06")
 
+def problem_07():
+  """
+  A bike accelerates uniformly from rest to a speed of 7.10 m/s over a distance of 35.4 m.
+  Determine the acceleration of the bike.
+  """
+
+  s = Solver()
+  a = Real("a")
+  t = Real("t")
+  d = Real("d")
+  v = Real("v")
+
+  s.add(v == 7.10)
+  s.add(d == 35.4)
+  s.add(a*t == v)
+  s.add(t*v/2 == d)
+
+  print_solution(s, "07")
+
 
 set_option(rational_to_decimal=True)
 for p in dir():
