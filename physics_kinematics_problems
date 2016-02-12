@@ -59,11 +59,32 @@ def problem_03():
 
   print_solution(s, "03")
 
+def problem_04():
+  """
+  A race car accelerates uniformly from 18.5 m/s to 46.1 m/s in 2.47 seconds. Determine the acceleration of the car and the distance traveled.
+  """
+  s = Solver()
+  a = Real("a")
+  t = Real("t")
+  vs= Real("vs")
+  ve = Real("ve")
+  d = Real("d")
+
+  s.add(vs == 18.5)
+  s.add(ve == 46.1)
+  s.add(t == 2.47)
+  s.add(a == (ve-vs)/t)
+  s.add(d == (vs+ve)/2*t)
+
+  print_solution(s, "04")
+
+
 
 set_option(rational_to_decimal=True)
 problem_01()
 problem_02()
 problem_03()
+problem_04()
 
 """
 http://www.physicsclassroom.com/class/1DKin/Lesson-6/Sample-Problems-and-Solutions
