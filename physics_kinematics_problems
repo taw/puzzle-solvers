@@ -135,6 +135,27 @@ def problem_07():
 
   print_solution(s, "07")
 
+def problem_08():
+  """
+  An engineer is designing the runway for an airport.
+  Of the planes that will use the airport, the lowest acceleration rate is likely to be 3 m/s2.
+  The takeoff speed for this plane will be 65 m/s.
+  Assuming this minimum acceleration, what is the minimum allowed length for the runway?
+  """
+
+  s = Solver()
+  a = Real("a")
+  t = Real("t")
+  d = Real("d")
+  v = Real("v")
+
+  s.add(a == 3)
+  s.add(v == 65)
+  s.add(a*t == v)
+  s.add(t*v/2 == d)
+
+  print_solution(s, "08")
+
 
 set_option(rational_to_decimal=True)
 for p in dir():
