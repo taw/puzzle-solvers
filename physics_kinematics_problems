@@ -3,6 +3,13 @@
 from __future__ import print_function
 from z3 import *
 
+def print_solution(s, problem):
+  print("Problem %s" % problem)
+  if s.check() == sat:
+    print(s.model())
+  else:
+    print("No solution")
+
 def problem_01():
   """
   An airplane accelerates down a runway at 3.20 m/s2 for 32.8 s until is finally lifts off the ground.
@@ -17,10 +24,7 @@ def problem_01():
   s.add(t == 32.8)
   s.add(d == a*t*t/2)
 
-  if s.check() == sat:
-    print(s.model())
-  else:
-    print("No solution")
+  print_solution(s, "01")
 
 def problem_02():
   """
@@ -35,15 +39,31 @@ def problem_02():
   s.add(t == 5.21)
   s.add(d == 110)
 
-  if s.check() == sat:
-    print(s.model())
-  else:
-    print("No solution")
+  print_solution(s, "02")
+
+def problem_03():
+  """
+  Upton Chuck is riding the Giant Drop at Great America.
+  If Upton free falls for 2.60 seconds, what will be his final velocity and how far will he fall?
+  """
+  s = Solver()
+  a = Real("a")
+  t = Real("t")
+  v = Real("v")
+  d = Real("d")
+
+  s.add(a == 9.81)
+  s.add(d == a*t*t/2)
+  s.add(v == a*t)
+  s.add(t == 2.60)
+
+  print_solution(s, "03")
 
 
+set_option(rational_to_decimal=True)
 problem_01()
 problem_02()
-
+problem_03()
 
 """
 http://www.physicsclassroom.com/class/1DKin/Lesson-6/Sample-Problems-and-Solutions
