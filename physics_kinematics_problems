@@ -96,6 +96,25 @@ def problem_05():
 
   print_solution(s, "05")
 
+def problem_06():
+  """
+  Rocket-powered sleds are used to test the human response to acceleration.
+  If a rocket-powered sled is accelerated to a speed of 444 m/s in 1.83 seconds,
+  then what is the acceleration and what is the distance that the sled travels?
+  """
+
+  s = Solver()
+  a = Real("a")
+  t = Real("t")
+  d = Real("d")
+  v = Real("v")
+
+  s.add(v == 444)
+  s.add(t == 1.83)
+  s.add(v == a*t)
+  s.add(d == a*t*t/2)
+
+  print_solution(s, "06")
 
 
 set_option(rational_to_decimal=True)
