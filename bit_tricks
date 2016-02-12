@@ -3,6 +3,31 @@
 from __future__ import print_function
 from z3 import *
 
+# Based on Z3 source code
+def prove_with_solver(s, claim, **keywords):
+  """Try to prove the given claim.
+
+  This is a simple function for creating demonstrations.  It tries to prove
+  `claim` by showing the negation is unsatisfiable.
+
+  >>> p, q = Bools('p q')
+  >>> prove(Not(And(p, q)) == Or(Not(p), Not(q)))
+  proved
+  """
+  s.set(**keywords)
+  s.add(Not(claim))
+  if keywords.get('show', False):
+    print(s)
+  r = s.check()
+  if r == unsat:
+    print("proved")
+  elif r == unknown:
+    print("failed to prove")
+    print(s.model())
+  else:
+    print("counterexample")
+    print(s.model())
+
 def validate_sign_by_shift():
   """
   sign = v >> (sizeof(int) * CHAR_BIT - 1);
@@ -36,7 +61,7 @@ def validate_opposite_sign_by_xor():
     )
   )
 
-def validate_abs_without_branches_1():
+def validate_abs_without_branching_1():
   """
   int v;           // we want to find the absolute value of v
   unsigned int r;  // the result goes here
@@ -54,7 +79,7 @@ def validate_abs_without_branches_1():
     )
   )
 
-def validate_abs_without_branches_2():
+def validate_abs_without_branching_2():
   """
   int v;           // we want to find the absolute value of v
   unsigned int r;  // the result goes here
@@ -72,12 +97,66 @@ def validate_abs_without_branches_2():
     )
   )
 
+def c_boolean(solver, bool_expr):
+  expr_val = BitVec("t", 32)
+  # zero = BitVec("0", 32)
+  # one  = BitVec("1", 32)
+  # solver.add(zero == 0)
+  # solver.add(one == 0)
+  solver.add(
+    Or(
+      And(bool_expr, expr_val == 1),
+      And(Not(bool_expr), expr_val == 0)
+    )
+  )
+  return expr_val
+
+def validate_min_without_branching():
+  """
+  int x;  // we want to find the minimum of x and y
+  int y;
+  int r;  // the result goes here
+  r = y ^ ((x ^ y) & -(x < y)); // min(x, y)
+  """
+  s = Solver()
+  x = BitVec("x", 32)
+  y = BitVec("y", 32)
+  r = y ^ ((x ^ y) & -c_boolean(s, x < y))
+  print("Validating min without branching")
+  prove_with_solver(
+    s,
+    Or(
+      And(x <= y, r == x),
+      And(y <= y, r == y),
+    )
+  )
+
+def validate_max_without_branching():
+  """
+  int x;  // we want to find the minimum of x and y
+  int y;
+  int r;  // the result goes here
+  r = x ^ ((x ^ y) & -(x < y)); // max(x, y)
+  """
+  s = Solver()
+  x = BitVec("x", 32)
+  y = BitVec("y", 32)
+  r = x ^ ((x ^ y) & -c_boolean(s, x < y))
+  print("Validating max without branching")
+  prove_with_solver(
+    s,
+    Or(
+      And(x >= y, r == x),
+      And(y >= y, r == y),
+    )
+  )
 
 validate_sign_by_shift()
 validate_opposite_sign_by_xor()
-validate_abs_without_branches_1()
-validate_abs_without_branches_2()
-
+validate_abs_without_branching_1()
+validate_abs_without_branching_2()
+validate_min_without_branching()
+validate_max_without_branching()
 
 """
 Based on https://graphics.stanford.edu/~seander/bithacks.html
