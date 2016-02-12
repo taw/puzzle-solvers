@@ -173,6 +173,24 @@ def problem_09():
 
   print_solution(s, "09")
 
+def problem_10():
+  """
+  A kangaroo is capable of jumping to a height of 2.62 m.
+  Determine the takeoff speed of the kangaroo.
+  """
+  s = Solver()
+  a = Real("a")
+  t = Real("t")
+  d = Real("d")
+  v = Real("v")
+
+  s.add(d == 2.62)
+  s.add(a == -9.81)
+  s.add(d == v*t/2)
+  s.add(v + a*t == 0)
+  s.add(t >= 0)
+
+  print_solution(s, "10")
 
 set_option(rational_to_decimal=True)
 for p in dir():
