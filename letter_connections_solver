@@ -18,7 +18,7 @@ class LetterConnections:
 
     data = {(x,y): data[y][x] for x in range(self.xsize) for y in range(self.ysize)}
 
-    for (x,y) in data:
+    for (x,y) in sorted(data):
       letter = data[x,y]
       if letter == ".":
         continue
