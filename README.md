@@ -29,3 +29,7 @@ Incomplete:
 
 Broken:
 * nurikabe: my approach is probably not going to work
+
+== Ruby version ==
+
+Solvers in the repository have Ruby versions available at https://github.com/taw/z3/tree/master/examples
