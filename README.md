@@ -1,5 +1,4 @@
-Unfortunately Z3 is not available for Ruby or even Python 3,
-so I decided to do some exercises to learn how to use Z3 with Python 2.x.
+Unfortunately Z3 was not available for Ruby or even Python 3, so I decided to do some exercises to learn how to use Z3 with Python 2.x.
 
 In other words - use Python 2.x to run these.
 
@@ -31,5 +30,7 @@ Broken:
 * nurikabe: my approach is probably not going to work
 
 ### Ruby version
+
+After writing those I decided to write Ruby interface for Z3 as well. Currently it's in fairly experimental stage, so it's probably still better to use Python 2 for serious business.
 
 Solvers in the repository have Ruby versions available at https://github.com/taw/z3/tree/master/examples
