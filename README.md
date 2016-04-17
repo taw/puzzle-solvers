@@ -7,7 +7,7 @@ To get z3 library, run this or equivalent:
 
     $ brew install z3
 
-== Solver status ==
+### Solver status
 
 Unfortunately some solvers don't fully follow rules of puzzles they try to solve,
 if rules were rather difficult to implement.
@@ -30,6 +30,6 @@ Incomplete:
 Broken:
 * nurikabe: my approach is probably not going to work
 
-== Ruby version ==
+### Ruby version
 
 Solvers in the repository have Ruby versions available at https://github.com/taw/z3/tree/master/examples
