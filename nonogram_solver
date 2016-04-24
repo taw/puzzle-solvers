@@ -31,7 +31,10 @@ class Nonogram:
       for v in self.model:
         current_solution.append(v() != self.model[v])
       self.solver.add(z3.Or(current_solution))
-      print()
+      if self.solver.check() == z3.sat:
+        print("solution is not unique")
+      else:
+        print("solution is unique")
     else:
       print("failed to solve")
 
